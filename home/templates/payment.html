@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>بوابة الدفع | INKI</title>
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background-color: #0a0a0a;
+      font-family: 'Tajawal', Arial, sans-serif;
+      direction: rtl;
+      color: white;
+      min-height: 100vh;
+    }
+
+    .bnar {
+      background-color: #000;
+      height: 75px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    .bnar h1 { color:#fff; font-size:36px; font-weight:700; margin-left:15px; }
+    .bnar img { width:60px; height:60px; border-radius:50%; }
+
+    .payment-container {
+      background-color: #111;
+      padding: 40px;
+      border-radius: 15px;
+      width: 100%;
+      max-width: 400px;
+      margin: 40px auto;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.4);
+    }
+
+    .payment-container h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #fffcff;
+    }
+
+    label { display:block; margin-bottom:8px; font-weight:bold; color:#ccc; }
+    input {
+      width:100%;
+      padding:12px;
+      margin-bottom:20px;
+      border:none;
+      border-radius:8px;
+      background-color:#222;
+      color:white;
+      font-size:16px;
+    }
+    input:focus { outline:2px solid #fffeff; }
+
+    .option-buttons {
+      display:flex;
+      gap:10px;
+      margin-bottom:20px;
+    }
+    .option-buttons button {
+      flex:1;
+      padding:12px;
+      font-size:16px;
+      font-weight:bold;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      transition: all 0.3s ease;
+      color:rgb(14, 13, 13);
+      background-color:#333;
+    }
+    .option-buttons button.selected {
+      background-color:#ffffff;
+    }
+    .option-buttons button:hover { opacity:0.9; }
+
+    .pay-btn {
+      width:100%;
+      padding:14px;
+      font-size:18px;
+      font-weight:bold;
+      border:none;
+      border-radius:8px;
+      cursor:pointer;
+      background-color:#eed254;
+      color:white;
+      transition: all 0.3s ease;
+    }
+    .pay-btn:hover { opacity:0.9; transform:translateY(-2px); }
+
+    .amount-wrapper {
+      display:flex;
+      gap:10px;
+      align-items:center;
+      margin-bottom:10px;
+    }
+    .add-amount-btn {
+      padding:0 12px;
+      margin-top: -20px;
+      font-size:20px;
+      cursor:pointer;
+      border:none;
+      border-radius:5px;
+      background-color:#33cc33;
+      color:white;
+      height:40px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bnar">
+    {% load static %}
+    <h1><a href="{% url 'home' %}" style="text-decoration: none; color: inherit;" draggable="false">INKI</a></h1>
+    <img src="{% static 'logo.png' %}" alt="Logo">
+  </div>
+
+  <div class="payment-container">
+    <h1>بوابة الدفع</h1>
+
+    <form method="POST" action="{% url 'payment' %}">
+      {% csrf_token %}
+
+      <label for="product_id">رقم المنتج</label>
+      <input type="text" name="product_id" id="product_id" placeholder="أدخل رقم المنتج">
+
+      <label>الرصيد</label>
+      <div id="amounts-container">
+        <div class="amount-wrapper">
+          <input type="text" name="amount[]" placeholder="أدخل الرصيد">
+          <button type="button" class="add-amount-btn">+</button>
+        </div>
+      </div>
+
+      <label for="email">البريد الإلكتروني</label>
+      <input type="email" name="email" id="email" placeholder="أدخل بريدك الإلكتروني">
+
+      <div class="option-buttons">
+        <button type="button" id="atheer">أثير</button>
+        <button type="button" id="asia">آسيا</button>
+      </div>
+
+      <input type="hidden" name="payment_method" id="payment_method">
+      <button type="submit" class="pay-btn">دفع</button>
+    </form>
+  </div>
+
+  <script>
+    const atheerBtn = document.getElementById('atheer');
+    const asiaBtn = document.getElementById('asia');
+    const paymentMethodInput = document.getElementById('payment_method');
+
+    // اختيار واحد فقط
+    atheerBtn.addEventListener('click', () => {
+      atheerBtn.classList.add('selected');
+      asiaBtn.classList.remove('selected');
+      paymentMethodInput.value = 'أثير';
+    });
+    asiaBtn.addEventListener('click', () => {
+      asiaBtn.classList.add('selected');
+      atheerBtn.classList.remove('selected');
+      paymentMethodInput.value = 'آسيا';
+    });
+
+    // إضافة حقول رصيد جديدة
+    const amountsContainer = document.getElementById('amounts-container');
+    amountsContainer.addEventListener('click', (e) => {
+      if(e.target.classList.contains('add-amount-btn')) {
+        e.preventDefault(); // منع إرسال الفورم عند الضغط على الزر
+        const newWrapper = document.createElement('div');
+        newWrapper.classList.add('amount-wrapper');
+        newWrapper.innerHTML = `
+          <input type="text" name="amount[]" placeholder="أدخل الرصيد">
+          <button type="button" class="add-amount-btn">+</button>
+        `;
+        amountsContainer.appendChild(newWrapper);
+      }
+    });
+  </script>
+
+</body>
+</html>

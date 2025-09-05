@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>INKI | {{ category|upper }}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #0a0a0a;
+      font-family: 'Tajawal', Arial, sans-serif;
+      color: white;
+      direction: rtl;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    .bnar {
+      background-color: #000;
+      height: 75px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .bnar img {
+      width: 60px;
+      height: 60px;
+      margin-left: 10px;
+      border-radius: 50%;
+    }
+
+    .bnar h1 {
+      color: #fff;
+      font-size: 36px;
+      font-weight: 700;
+      margin-left: 15px;
+    }
+
+    #menu-btn {
+      position: fixed;
+      top: 50%;
+      left: 0;
+      transform: translate(-50%, -50%);
+      font-size: 28px;
+      cursor: pointer;
+      color: #fff;
+      background: #111;
+      border: none;
+      border-radius: 0 5px 5px 0;
+      width: 40px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1100;
+      transition: all 0.3s ease;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    #menu-btn:hover {
+      background: #222;
+      width: 45px;
+    }
+
+    .sidebar {
+      position: fixed;
+      left: -220px;
+      top: 0;
+      width: 220px;
+      height: 100%;
+      background-color: #1c1c1c;
+      color: white;
+      overflow-y: auto;
+      transition: left 0.3s ease;
+      z-index: 1000;
+      padding-top: 80px;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar.visible {
+      left: 0;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0 15px;
+    }
+
+    .sidebar li {
+      padding: 15px 10px;
+      border-bottom: 1px solid #444;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 5px;
+      margin-bottom: 5px;
+    }
+
+    .sidebar li:hover {
+      background-color: #f3f1f1;
+      color: #000;
+      transform: translateX(-5px);
+    }
+
+    .section {
+      margin: 30px 20px;
+      animation: fadeIn 0.5s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .section h2 {
+      margin-bottom: 15px;
+      font-size: 24px;
+      border-right: 4px solid #ebedf0;
+      padding-right: 15px;
+      color: #ff00ea;
+    }
+
+    .product-list {
+    display: flex;
+    flex-wrap: wrap;   /* ✅ خلي العناصر تنزل للسطر الجديد */
+    gap: 20px;
+    padding: 15px 5px;
+    justify-content: flex-start; /* أو space-between حسب اللي يعجبك */
+    }
+
+    .product-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .product {
+      flex: 1;
+      background-color: #111;
+      border-radius: 10px;
+      min-width: 200px;
+      max-width: 250px; 
+      padding: 15px;
+      flex-shrink: 0;
+      text-align: center;
+      transition: all 0.3s ease;
+      scroll-snap-align: start;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    .product:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      background-color: #1a1a1a;
+    }
+
+    .product img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #333;
+    }
+
+    .product h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .product .price {
+      color: #007bff;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .product .description {
+      font-size: 14px;
+      color: #aaa;
+      margin-top: 8px;
+    }
+
+    .back-to-top {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: #007bff;
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 99;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+    }
+
+    .back-to-top:hover {
+      background: #0069d9;
+      transform: translateY(-3px);
+    }
+
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #d3d5d8;
+      z-index: 9999;
+      animation: loading 1s infinite;
+    }
+
+    @keyframes loading {
+      0% { width: 0; left: 0 }
+      50% { width: 100%; left: 0 }
+      100% { width: 0; left: 100% }
+    }
+    #icon {
+      width: 63px;
+      height: 63px;
+      margin-left: auto;
+      margin-right: 10px;
+      position: absolute;
+      top: 30px;
+      left: 10px;
+    }
+    a{
+      text-decoration: none;
+      color: inherit;
+    }
+    .description_no{
+      color: rgb(185, 97, 65);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="loading"></div>
+
+  <div class="bnar">
+    {% load static %}
+    
+  <h1><a href="{% url 'home'  %}" draggable="false"> INKI</h1>
+  <img src="{% static 'logo.png' %}" alt="Logo"></a>
+  </div>
+<!-- 
+  <button id="menu-btn" aria-label="Toggle Menu">☰</button>
+
+  <div class="sidebar" id="sidebar">
+    <ul>
+      <li> الرئيسية</li>
+      <li> جميع المنتجات</li>
+      <li> عربة التسوق</li>
+      <li> حسابي</li>
+      <li> العروض الخاصة</li>
+      <li> الخدمات</li>
+      <li> الألعاب</li>
+      <li> تواصل معنا</li>
+      <li> تسجيل الدخول</li>
+      <li> تسجيل حساب جديد</li>
+      <li> عن المتجر</li>
+    </ul>
+  </div> -->
+
+  <div class="section">
+    <h2 id="rotating-message"></h2>
+
+<script>
+  const messages = [
+    "بطاقات هدايا مميزة 🎁",
+  "ثقة وأمان في كل عملية 💳",
+  "سهولة الدفع بدون تعقيد 🛒",
+  "حسابات نادرة ومميزة ✨",
+  "فريق دعم 24 ساعة 💬",
+  "عروض حصرية للمشتركين 🔥",
+  "تجربة تسوق سلسة ومريحة 🛍️",
+  "أحدث المنتجات أولًا 📦",
+  "خصومات مغرية كل أسبوع 💰",
+  "خدمة عملاء سريعة وودودة 🤝"
+  ];
+
+  const messageEl = document.getElementById('rotating-message');
+  let currentIndex = 0;
+  let charIndex = 0;
+
+  function randomColor() {
+      const letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+  }
+
+  function typeMessage() {
+      const currentMessage = messages[currentIndex];
+      messageEl.style.color = randomColor();
+      messageEl.textContent = currentMessage.slice(0, charIndex + 1);
+      charIndex++;
+
+      if(charIndex < currentMessage.length) {
+          setTimeout(typeMessage, 100); // سرعة ظهور الحروف
+      } else {
+          setTimeout(() => {
+              charIndex = 0;
+              currentIndex = (currentIndex + 1) % messages.length;
+              typeMessage();
+          }, 1500); // الانتظار قبل الرسالة التالية
+      }
+  }
+
+  typeMessage();
+</script>
+
+
+    <div class="product-list">
+      <!-- مثال على المنتجات من نفس النوع -->
+       {% for product in products %}
+    <div class="product">
+      <a href="{% url 'product_detail' product.pk %}">
+      <img src="{{product.image1.url}}" alt="{{ product.name }}"></a>
+      <h3>{{ product.name }}</h3>
+      <div class="price">{{ product.price }}</div>
+    </div>
+  {% endfor %}
+      </div>
+      
+      
+       
+    </div>
+  </div>
+
+  <div class="back-to-top" id="backToTop">↑</div>
+
+  <script>
+    const menuBtn = document.getElementById('menu-btn');
+    const sidebar = document.getElementById('sidebar');
+    const backToTop = document.getElementById('backToTop');
+
+    document.addEventListener('mousemove', (e) => {
+      const interactiveWidth = 70;
+      if (e.clientX <= interactiveWidth) {
+        sidebar.classList.add('visible');
+        menuBtn.style.opacity = '0';
+        menuBtn.style.pointerEvents = 'none';
+      } else {
+        sidebar.classList.remove('visible');
+        menuBtn.style.opacity = '1';
+        menuBtn.style.pointerEvents = 'auto';
+      }
+    });
+
+    window.addEventListener('scroll', () => {
+      if (window.pageYOffset > 300) {
+        backToTop.classList.add('visible');
+      } else {
+        backToTop.classList.remove('visible');
+      }
+    });
+
+    backToTop.addEventListener('click', () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    });
+
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        document.querySelector('.loading').style.display = 'none';
+      }, 500);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!sidebar.contains(e.target) ){
+        sidebar.classList.remove('visible');
+        menuBtn.style.opacity = '1';
+        menuBtn.style.pointerEvents = 'auto';
+      }
+    });
+  </script>
+
+</body>
+</html>

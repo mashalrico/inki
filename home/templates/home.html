@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>متجر إلكتروني - INKI</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #0a0a0a;
+      font-family: 'Tajawal', Arial, sans-serif;
+      color: white;
+      direction: rtl;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    .bnar {
+      background-color: #000;
+      height: 75px;
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+      margin-bottom: 40px;
+    }
+
+    .bnar img {
+      width: 60px;
+      height: 60px;
+      margin-left: 10px;
+      border-radius: 50%;
+    }
+
+    .bnar h1 {
+      color: #fff;
+      font-size: 36px;
+      font-weight: 700;
+      margin-left: 15px;
+    }
+
+    #menu-btn {
+      position: fixed;
+      top: 50%;
+      left: 0;
+      transform: translate(-50%, -50%);
+      font-size: 28px;
+      cursor: pointer;
+      color: #fff;
+      background: #111;
+      border: none;
+      border-radius: 0 5px 5px 0;
+      width: 40px;
+      height: 60px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1100;
+      transition: all 0.3s ease;
+      box-shadow: 2px 0 5px rgba(0, 0, 0, 0.3);
+    }
+
+    #menu-btn:hover {
+      background: #222;
+      width: 45px;
+    }
+
+    .sidebar {
+      position: fixed;
+      left: -220px;
+      top: 0;
+      width: 220px;
+      height: 100%;
+      background-color: #1c1c1c;
+      color: white;
+      overflow-y: auto;
+      transition: left 0.3s ease;
+      z-index: 1000;
+      padding-top: 80px;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .sidebar.visible {
+      left: 0;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0 15px;
+    }
+
+    .sidebar li {
+      padding: 15px 10px;
+      border-bottom: 1px solid #444;
+      font-size: 18px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border-radius: 5px;
+      margin-bottom: 5px;
+    }
+
+    .sidebar li:hover {
+      background-color: #f3f1f1;
+      color: #000;
+      transform: translateX(-5px);
+    }
+
+    .section {
+      margin: 30px 20px;
+      animation: fadeIn 0.5s ease;
+      display: flex;
+      flex-wrap: wrap;
+      flex: 1;
+      
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+     h2 {
+      margin-bottom: 25px;
+      font-size: 24px;
+      border-right: 4px solid #f9fbfc;
+      padding-right: 15px;
+      color: #007bff;
+      
+    }
+
+    .product-list {
+      display: flex;
+      flex-wrap: wrap; /* يسمح للمنتجات بالانتقال للسطر التالي */
+      gap: 20px;
+    }
+
+    .product-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .product {
+      background: #111;
+      border-radius: 10px;
+      padding: 15px;
+      text-align: center;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      flex: 1 1 200px; /* العرض الأساسي لكل منتج 200px، ينمو أو يصغر حسب المساحة */
+      width: 15%;
+     max-width: 225px;/* أقصى عرض للمنتج */
+       /* أقل عرض للمنتج */
+    }
+
+    .product:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+      background-color: #1a1a1a;
+    }
+
+    .product img {
+      width: 100%;
+      height: 160px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border: 1px solid #333;
+    }
+
+    .product h3 {
+      font-size: 16px;
+      margin-bottom: 10px;
+    }
+
+    .product .price {
+      color: #f6f7f8;
+      font-weight: bold;
+      font-size: 18px;
+    }
+
+    .product .description {
+      font-size: 14px;
+      color: #aaa;
+      margin-top: 8px;
+    }
+
+    /* زر العودة للأعلى */
+    .back-to-top {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: #007bff;
+      color: white;
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      opacity: 0;
+      transition: all 0.3s;
+      z-index: 99;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    }
+
+    .back-to-top.visible {
+      opacity: 1;
+    }
+
+    .back-to-top:hover {
+      background: #0069d9;
+      transform: translateY(-3px);
+    }
+
+    /* تأثيرات لتحسين UX */
+    .loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: #d3d5d8;
+      z-index: 9999;
+      animation: loading 1s infinite;
+    }
+
+    @keyframes loading {
+      0% { width: 0; left: 0 }
+      50% { width: 100%; left: 0 }
+      100% { width: 0; left: 100% }
+    }
+    #icon {
+      width: 63px;
+      height: 63px;
+      margin-left: auto;
+      margin-right: 10px;
+      position: absolute;
+      top: 30px;
+      left: 10px;
+    }
+    a{
+      text-decoration: none;
+      color: inherit;
+    }
+    .description_no{
+      color: rgb(185, 97, 65);
+
+    }
+    .footer-images {
+      display: flex;
+      justify-content: left;
+      gap: 0px; 
+      margin-bottom: -20px;
+      border-radius: 12px;
+      
+    }
+
+  </style>
+  <link href="https://youtu.be/6WV0CUdYvNY?si=s_3cilCMWhXTXI7j" rel="stylesheet">
+</head>
+<body>
+
+  <div class="loading"></div>
+
+  <div class="bnar">
+    {% load static %}
+    
+  <h1><a href="{% url 'home' %}" style="text-decoration: none; color: inherit;" draggable="false">INKI</h1>
+  <img src="{% static 'logo.png' %}" alt="Logo"></a>
+
+    
+    
+  </div>
+
+  <!-- <button id="menu-btn" aria-label="Toggle Menu">☰</button> -->
+
+  <!-- <div class="sidebar" id="sidebar">
+    <ul>
+      <li>🏠 الرئيسية</li>
+      <li>🛍️ جميع المنتجات</li>
+      <li>🛒 عربة التسوق</li>
+      <li>👤 حسابي</li>
+      <li>🔥 العروض الخاصة</li>
+      <li>💎 الخدمات</li>
+      <li>🎮 الألعاب</li>
+      <li>📞 تواصل معنا</li>
+      <li>🔐 تسجيل الدخول</li>
+      <li>📝 تسجيل حساب جديد</li>
+      <li>ℹ️ عن المتجر</li>
+    </ul>
+  </div> -->
+
+  <!-- الأقسام كاملة -->
+  <!-- مكان عرض الرسائل -->
+
+<h2 id="rotating-message"></h2>
+
+<script>
+  const messages = [
+    "مرحبا بك في INKI!",
+    "احصل على أفضل العروض الآن!",
+    "تسوق منتجاتك المفضلة بسهولة.",
+    "تابعنا لتصلك أحدث التحديثات."
+  ];
+
+  const messageEl = document.getElementById('rotating-message');
+  let currentIndex = 0;
+  let charIndex = 0;
+
+  function randomColor() {
+      const letters = '0123456789ABCDEF';
+      let color = '#';
+      for (let i = 0; i < 6; i++) {
+          color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+  }
+
+  function typeMessage() {
+      const currentMessage = messages[currentIndex];
+      messageEl.style.color = randomColor();
+      messageEl.textContent = currentMessage.slice(0, charIndex + 1);
+      charIndex++;
+
+      if(charIndex < currentMessage.length) {
+          setTimeout(typeMessage, 100); // سرعة ظهور الحروف
+      } else {
+          setTimeout(() => {
+              charIndex = 0;
+              currentIndex = (currentIndex + 1) % messages.length;
+              typeMessage();
+          }, 1500); // الانتظار قبل الرسالة التالية
+      }
+  }
+
+  typeMessage();
+</script>
+
+
+
+  <div class="section">
+    
+    <div class="product-list">
+      <!-- <div class="product">
+        <img src="/home/rico/Desktop/متجري/b2fcf3d6a6c7c5814c0d4c583a16b4e1.jpg" alt="">
+        <h3>حساب Netflix</h3>
+        <div class="price">50 ر.س</div>
+        <div class="description">حساب بريميوم لمدة 6 أشهر</div>
+      </div> -->
+      <!-- <div class="product">
+        <img src="psn.jpg" alt="">
+        <h3>حساب PSN</h3>
+        <div class="price">120 ر.س</div>
+        <div class="description">بلايستيشن بلس لمدة سنة</div>
+      </div> -->
+      {% for product in categories %}
+  <div class="product">
+    <a href="{% url 'category_view' product.category %}">
+      <img src="{{ product.image1.url }}" alt="{{ product.category }}">
+    </a>
+    <h3 style="color: {{ product.color }};">{{ product.category }}</h3>
+  </div>
+{% endfor %}
+
+      
+      
+      
+    </div>
+  </div>
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+  <div class="back-to-top" id="backToTop"></div>
+  
+
+  <!-- سكربت تحكم القائمة -->
+<script>
+    const menuBtn = document.getElementById('menu-btn');
+    const sidebar = document.getElementById('sidebar');
+    const backToTop = document.getElementById('backToTop');
+
+    // تحكم القائمة الجانبية
+    document.addEventListener('mousemove', (e) => {
+        const interactiveWidth = 70;
+        if (e.clientX <= interactiveWidth) {
+            sidebar.classList.add('visible');
+            menuBtn.style.opacity = '0';
+            menuBtn.style.pointerEvents = 'none';
+        } else {
+            sidebar.classList.remove('visible');
+            menuBtn.style.opacity = '1';
+            menuBtn.style.pointerEvents = 'auto';
+        }
+    });
+
+    // زر العودة للأعلى
+    window.addEventListener('scroll', () => {
+        if (window.pageYOffset > 300) {
+            backToTop.classList.add('visible');
+        } else {
+            backToTop.classList.remove('visible');
+        }
+    });
+
+    backToTop.addEventListener('click', () => {
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+    });
+
+    // تأثير التحميل
+    window.addEventListener('load', () => {
+        setTimeout(() => {
+            document.querySelector('.loading').style.display = 'none';
+        }, 500);
+    });
+
+    // إغلاق القائمة عند النقر خارجها
+    document.addEventListener('click', (e) => {
+        if (!sidebar.contains(e.target)) {
+            sidebar.classList.remove('visible');
+            menuBtn.style.opacity = '1';
+            menuBtn.style.pointerEvents = 'auto';
+        }
+    });
+
+
+</script>
+
+
+</body>
+</html>
